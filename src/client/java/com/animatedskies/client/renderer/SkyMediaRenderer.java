@@ -1,5 +1,6 @@
 package com.animatedskies.client.renderer;
 
+import net.minecraft.client.gl.ShaderProgramKeys;
 import org.joml.Matrix4f;
 
 import com.animatedskies.client.enum_and_class.MediaType;
@@ -10,6 +11,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.util.Util;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
 import net.minecraft.client.render.GameRenderer;
@@ -145,7 +147,8 @@ public class SkyMediaRenderer {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
 
         RenderSystem.setShaderTexture(0, texture);
 
@@ -156,23 +159,28 @@ public class SkyMediaRenderer {
         BufferBuilder buffer =
                 tessellator.begin(
                         VertexFormat.DrawMode.QUADS,
-                        VertexFormats.POSITION_TEXTURE
+                        VertexFormats.POSITION_TEXTURE_COLOR
                 );
 
         /*
          * Centered quad
          */
         buffer.vertex(matrix, -0.5f, -0.5f, 0f)
-        .texture(u0, v1);
+                 .texture(u0, v1)
+                 .color(255, 255, 255, 255);
 
         buffer.vertex(matrix, 0.5f, -0.5f, 0f)
-                .texture(u1, v1);
+                .texture(u1, v1)
+                .color(255, 255, 255, 255);
+
 
         buffer.vertex(matrix, 0.5f, 0.5f, 0f)
-                .texture(u1, v0);
+                .texture(u1, v0)
+                .color(255, 255, 255, 255);
 
         buffer.vertex(matrix, -0.5f, 0.5f, 0f)
-                .texture(u0, v0);
+                .texture(u0, v0)
+                .color(255, 255, 255, 255);
 
         BufferRenderer.drawWithGlobalProgram(
                 buffer.end()

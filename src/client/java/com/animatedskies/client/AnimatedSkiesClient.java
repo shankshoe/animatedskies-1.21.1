@@ -20,7 +20,6 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceReloader;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 
@@ -54,8 +53,6 @@ public class AnimatedSkiesClient implements ClientModInitializer {
                     public CompletableFuture<Void> reload(
                             ResourceReloader.Synchronizer synchronizer,
                             ResourceManager manager,
-                            Profiler prepareProfiler,
-                            Profiler applyProfiler,
                             Executor prepareExecutor,
                             Executor applyExecutor
                     ) {
