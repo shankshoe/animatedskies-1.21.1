@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "animatedskies",
+	"version": "${version}",
+	"name": "AnimatedSkies",
+	"description": "Add your own details to the sky",
+	"authors": [
+		"Chefmakes"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/animatedskies/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"client": [
+			"com.animatedskies.client.AnimatedSkiesClient"
+		]
+	},
+	"mixins": [
+		"animatedskies.mixins.json",
+		{
+			"config": "animatedskies.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
