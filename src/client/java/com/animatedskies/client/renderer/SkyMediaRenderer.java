@@ -9,11 +9,19 @@ import com.animatedskies.client.utils.SkyMediaTextureLoader;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gl.ShaderProgram;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.RegistryKey;
@@ -46,7 +54,13 @@ public class SkyMediaRenderer {
 
         if (texture == null) {return;}
         
-        matrices.push();
+        var gpuTexture =
+        CLIENT.getTextureManager()
+                .getTexture(texture)
+                .getGlTexture();
+
+                
+                matrices.push();
 
 
         
@@ -144,53 +158,35 @@ public class SkyMediaRenderer {
                 v0 = v1 - visibleHeightUV;
                 }
 
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        //RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        RenderSystem.setShaderTexture(0, gpuTexture);
+        
+       VertexConsumerProvider.Immediate immediate =
+        CLIENT.getBufferBuilders().getEntityVertexConsumers();
 
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(false); // don't write to depth buffer 
+VertexConsumer buffer =
+        immediate.getBuffer(RenderLayer.getGuiTextured(texture));
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
+MatrixStack.Entry entry = matrices.peek();
 
-        RenderSystem.setShaderTexture(0, texture);
+buffer.vertex(entry, -0.5f, -0.5f, 0f)
+        .color(255, 255, 255, 255)
+        .texture(u0, v1);
 
-        Matrix4f matrix = matrices.peek().getPositionMatrix();
+buffer.vertex(entry, 0.5f, -0.5f, 0f)
+        .color(255, 255, 255, 255)
+        .texture(u1, v1);
 
-        Tessellator tessellator = Tessellator.getInstance();
+buffer.vertex(entry, 0.5f, 0.5f, 0f)
+        .color(255, 255, 255, 255)
+        .texture(u1, v0);
 
-        BufferBuilder buffer =
-                tessellator.begin(
-                        VertexFormat.DrawMode.QUADS,
-                        VertexFormats.POSITION_TEXTURE_COLOR
-                );
+buffer.vertex(entry, -0.5f, 0.5f, 0f)
+        .color(255, 255, 255, 255)
+        .texture(u0, v0);
 
-        /*
-         * Centered quad
-         */
-        buffer.vertex(matrix, -0.5f, -0.5f, 0f)
-                 .texture(u0, v1)
-                 .color(255, 255, 255, 255);
-
-        buffer.vertex(matrix, 0.5f, -0.5f, 0f)
-                .texture(u1, v1)
-                .color(255, 255, 255, 255);
-
-
-        buffer.vertex(matrix, 0.5f, 0.5f, 0f)
-                .texture(u1, v0)
-                .color(255, 255, 255, 255);
-
-        buffer.vertex(matrix, -0.5f, 0.5f, 0f)
-                .texture(u0, v0)
-                .color(255, 255, 255, 255);
-
-        BufferRenderer.drawWithGlobalProgram(
-                buffer.end()
-        );
-
-        RenderSystem.depthMask(true);
-        RenderSystem.disableBlend();
-
+immediate.draw();
+        
         matrices.pop();
     }
 

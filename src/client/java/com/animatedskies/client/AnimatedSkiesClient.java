@@ -33,10 +33,11 @@ public class AnimatedSkiesClient implements ClientModInitializer {
 
         //SkyMediaProcessor.processAll();
         
+        
         WorldRenderEvents.AFTER_TRANSLUCENT.register(context ->
                 SkyMediaRenderer.render(
                         context.matrixStack(),
-                        context.tickCounter().getTickDelta(true)
+                        context.tickCounter().getTickProgress(true)
                 )
         );
         

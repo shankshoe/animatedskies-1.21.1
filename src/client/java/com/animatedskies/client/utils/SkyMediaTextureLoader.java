@@ -32,7 +32,9 @@ public class SkyMediaTextureLoader {
                 );
 
         NativeImageBackedTexture texture =
-                new NativeImageBackedTexture(image);
+                 new NativeImageBackedTexture(
+                () -> "animatedskies_" + media.getName(),
+                image);
 
         Identifier id = Identifier.of(
                 "animatedskies",
