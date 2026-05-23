@@ -17,6 +17,8 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayer.MultiPhaseParameters;
+import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -31,6 +33,17 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 
 public class SkyMediaRenderer {
+
+private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
+    return RenderLayer.of(
+        "sky_media",
+        256,
+        RenderPipelines.GUI_TEXTURED, // or POSITION_COLOR_TEXTURE pipeline
+        MultiPhaseParameters.builder()
+            .texture(new RenderPhase.Texture(texture, false))
+            .build(false)
+    );
+}
 
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
@@ -54,6 +67,8 @@ public class SkyMediaRenderer {
 
         if (texture == null) {return;}
         
+        var textureObject = CLIENT.getTextureManager().getTexture(texture);
+
         var gpuTexture =
         CLIENT.getTextureManager()
                 .getTexture(texture)
@@ -159,13 +174,11 @@ public class SkyMediaRenderer {
                 }
 
         //RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.setShaderTexture(0, gpuTexture);
-        
-       VertexConsumerProvider.Immediate immediate =
-        CLIENT.getBufferBuilders().getEntityVertexConsumers();
+        VertexConsumerProvider.Immediate immediate =
+    CLIENT.getBufferBuilders().getEntityVertexConsumers();
 
 VertexConsumer buffer =
-        immediate.getBuffer(RenderLayer.getGuiTextured(texture));
+    immediate.getBuffer(SKY_MEDIA_LAYER(texture));
 
 MatrixStack.Entry entry = matrices.peek();
 
