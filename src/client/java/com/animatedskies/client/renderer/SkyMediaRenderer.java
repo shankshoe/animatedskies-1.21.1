@@ -1,6 +1,5 @@
 package com.animatedskies.client.renderer;
 
-import net.minecraft.client.gl.ShaderProgramKeys;
 import org.joml.Matrix4f;
 
 import com.animatedskies.client.enum_and_class.MediaType;
@@ -9,18 +8,17 @@ import com.animatedskies.client.utils.SkyMediaManager;
 import com.animatedskies.client.utils.SkyMediaTextureLoader;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.minecraft.util.Util;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.ShaderProgramKeys;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.BufferRenderer;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 
@@ -50,8 +48,10 @@ public class SkyMediaRenderer {
         
         matrices.push();
 
-        int renderDistanceChunks = CLIENT.options.getViewDistance().getValue();
 
+        
+        int renderDistanceChunks = CLIENT.options.getViewDistance().getValue();
+        
         float renderDistanceBlocks = renderDistanceChunks * 16.0f;
 
         matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(media.QuadXpos));
@@ -93,11 +93,11 @@ public class SkyMediaRenderer {
                 * Vertical spritesheet:
                 * each frame is stacked top-to-bottom
                 */
-                float frameHeightUV = 1.0f / media.getFrameCount();
-
+               float frameHeightUV = 1.0f / media.getFrameCount();
+               
                 v0 = frame * frameHeightUV;
                 v1 = v0 + frameHeightUV;
-        }
+            }
 
         if (media.getMediaType() == MediaType.VIDEO) {
 
@@ -140,15 +140,17 @@ public class SkyMediaRenderer {
                 float rowTop = 1.0f - (row * cellHeightUV);
 
                 v1 = rowTop - padY;
-
+                
                 v0 = v1 - visibleHeightUV;
                 }
 
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(false); // don't write to depth buffer 
 
-        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX);
+        RenderSystem.setShader(ShaderProgramKeys.POSITION_TEX_COLOR);
 
         RenderSystem.setShaderTexture(0, texture);
 
@@ -186,6 +188,7 @@ public class SkyMediaRenderer {
                 buffer.end()
         );
 
+        RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
 
         matrices.pop();

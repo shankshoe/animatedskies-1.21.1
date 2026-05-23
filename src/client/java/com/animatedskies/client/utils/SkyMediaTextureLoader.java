@@ -27,29 +27,28 @@ public class SkyMediaTextureLoader {
                     );
 
             NativeImage image =
-                    NativeImage.read(
-                            Files.newInputStream(path)
-                    );
+                NativeImage.read(
+                        Files.newInputStream(path)
+                );
 
-            NativeImageBackedTexture texture =
-                    new NativeImageBackedTexture(image);
+        NativeImageBackedTexture texture =
+                new NativeImageBackedTexture(image);
 
-            Identifier id =
-                    CLIENT.getTextureManager()
-                            .registerDynamicTexture(
-                                    "animatedskies_"
-                                            + media.getName(),
-                                    texture
-                            );
+        Identifier id = Identifier.of(
+                "animatedskies",
+                "dynamic/" + media.getName().toLowerCase()
+        );
 
-            media.setTextureId(id);
+        CLIENT.getTextureManager().registerTexture(id, texture);
 
-            System.out.println(
-                    "[AnimatedSkies] Loaded texture: "
-                            + media.getName()
-            );
+        media.setTextureId(id);
 
-            return id;
+        System.out.println(
+                "[AnimatedSkies] Loaded texture: "
+                        + media.getName()
+        );
+
+        return id;
 
         } catch (Exception e) {
 
