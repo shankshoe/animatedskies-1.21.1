@@ -3,6 +3,7 @@ package com.animatedskies.client.gui;
 import com.animatedskies.client.config.SkyMediaConfigManager;
 import com.animatedskies.client.enum_and_class.SkyMedia;
 import com.animatedskies.client.utils.SkyMediaManager;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -82,7 +83,6 @@ public class SkyWidgetsScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
 
         context.drawCenteredTextWithShadow(
                 textRenderer,

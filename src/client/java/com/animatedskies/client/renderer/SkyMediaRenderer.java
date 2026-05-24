@@ -38,7 +38,7 @@ private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
     return RenderLayer.of(
         "sky_media",
         256,
-        RenderPipelines.GUI_TEXTURED, // or POSITION_COLOR_TEXTURE pipeline
+        RenderPipelines.GUI_TEXTURED, 
         MultiPhaseParameters.builder()
             .texture(new RenderPhase.Texture(texture, false))
             .build(false)
