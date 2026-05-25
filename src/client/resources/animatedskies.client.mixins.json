@@ -3,7 +3,8 @@
 	"package": "com.animatedskies.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-        "ScreenAccessor"
+        "ScreenAccessor",
+        "WorldRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

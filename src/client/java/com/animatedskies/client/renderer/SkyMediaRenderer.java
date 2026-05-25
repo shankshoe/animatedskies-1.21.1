@@ -15,6 +15,7 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.BuiltBuffer;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayer.MultiPhaseParameters;
@@ -38,30 +39,39 @@ private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
     return RenderLayer.of(
         "sky_media",
         256,
-        RenderPipelines.GUI_TEXTURED, 
+        RenderPipelines.POSITION_TEX_COLOR_END_SKY,
         MultiPhaseParameters.builder()
-            .texture(new RenderPhase.Texture(texture, false))
+
+            .texture(
+                new RenderPhase.Texture(
+                    texture,
+                    false
+                )
+            )
+
+
             .build(false)
     );
 }
 
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
-    public static void render(MatrixStack matrices, float tickDelta) {
+    public static void render(Camera camera, float tickDelta, VertexConsumerProvider.Immediate immediate) {
+        if (CLIENT.world == null || CLIENT.player == null) return;
+        if (SkyMediaManager.getActiveMedia().isEmpty()) return;
 
-        if (CLIENT.world == null || CLIENT.player == null) {return;}
-        if (SkyMediaManager.getActiveMedia().isEmpty()) {return;}
+        MatrixStack matrices = new MatrixStack();
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(camera.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw() + 180.0f));
 
         for (SkyMedia media : SkyMediaManager.getActiveMedia()) {
-
-            if (!shouldRenderInCurrentDimension(media)) {continue;}
-            if (!shouldRenderAtCurrentTime(media)) {continue;}
-
-            renderMedia(matrices, media, tickDelta);
+            if (!shouldRenderInCurrentDimension(media)) continue;
+            if (!shouldRenderAtCurrentTime(media)) continue;
+            renderMedia(matrices, media, tickDelta, immediate);
         }
     }
 
-    private static void renderMedia(MatrixStack matrices, SkyMedia media, float tickDelta) {
+    private static void renderMedia(MatrixStack matrices, SkyMedia media, float tickDelta, VertexConsumerProvider.Immediate immediate) {
 
         Identifier texture = SkyMediaTextureLoader.getTexture(media);
 
@@ -174,29 +184,46 @@ private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
                 }
 
         //RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        VertexConsumerProvider.Immediate immediate =
-    CLIENT.getBufferBuilders().getEntityVertexConsumers();
-
-VertexConsumer buffer =
-    immediate.getBuffer(SKY_MEDIA_LAYER(texture));
+    VertexConsumer buffer =
+        immediate.getBuffer(
+                SKY_MEDIA_LAYER(texture)
+        );
 
 MatrixStack.Entry entry = matrices.peek();
 
+int light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+
 buffer.vertex(entry, -0.5f, -0.5f, 0f)
-        .color(255, 255, 255, 255)
+        .color(255,255,255,255)
         .texture(u0, v1);
+        //.overlay(OverlayTexture.DEFAULT_UV)       
+        //.light(light) 
+        //.normal(entry, 0f, 0f, 1f);              
+        
 
 buffer.vertex(entry, 0.5f, -0.5f, 0f)
-        .color(255, 255, 255, 255)
+        .color(255,255,255,255)
         .texture(u1, v1);
+        //.overlay(OverlayTexture.DEFAULT_UV)       
+        //.light(light) 
+        //.normal(entry, 0f, 0f, 1f);              
+        
 
 buffer.vertex(entry, 0.5f, 0.5f, 0f)
-        .color(255, 255, 255, 255)
+        .color(255,255,255,255)
         .texture(u1, v0);
+        //.overlay(OverlayTexture.DEFAULT_UV)       
+        //.light(light) 
+        //.normal(entry, 0f, 0f, 1f);              
+        
 
 buffer.vertex(entry, -0.5f, 0.5f, 0f)
-        .color(255, 255, 255, 255)
+        .color(255,255,255,255)
         .texture(u0, v0);
+        //.overlay(OverlayTexture.DEFAULT_UV)       
+        //.light(light) 
+        //.normal(entry, 0f, 0f, 1f);              
+        
 
 immediate.draw();
         
