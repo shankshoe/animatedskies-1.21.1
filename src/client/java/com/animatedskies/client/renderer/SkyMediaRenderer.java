@@ -213,7 +213,9 @@ immediate.draw();
 
             case END -> current == World.END;
 
-            default -> true;
+            case BOTH -> current == World.OVERWORLD || current == World.END;
+
+            default -> false;
         };
     }
 
