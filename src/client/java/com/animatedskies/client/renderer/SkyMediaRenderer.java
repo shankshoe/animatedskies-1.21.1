@@ -6,8 +6,11 @@ import com.animatedskies.client.enum_and_class.MediaType;
 import com.animatedskies.client.enum_and_class.SkyMedia;
 import com.animatedskies.client.utils.SkyMediaManager;
 import com.animatedskies.client.utils.SkyMediaTextureLoader;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+
+import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gl.ShaderProgram;
@@ -18,11 +21,10 @@ import net.minecraft.client.render.BuiltBuffer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayer.MultiPhaseParameters;
-import net.minecraft.client.render.RenderPhase;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.RenderLayers;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.render.VertexFormats;
@@ -34,25 +36,6 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 
 public class SkyMediaRenderer {
-
-private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
-    return RenderLayer.of(
-        "sky_media",
-        256,
-        RenderPipelines.POSITION_TEX_COLOR_END_SKY,
-        MultiPhaseParameters.builder()
-
-            .texture(
-                new RenderPhase.Texture(
-                    texture,
-                    false
-                )
-            )
-
-
-            .build(false)
-    );
-}
 
     private static final MinecraftClient CLIENT = MinecraftClient.getInstance();
 
@@ -69,6 +52,7 @@ private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
             if (!shouldRenderAtCurrentTime(media)) continue;
             renderMedia(matrices, media, tickDelta, immediate);
         }
+        immediate.draw();
     }
 
     private static void renderMedia(MatrixStack matrices, SkyMedia media, float tickDelta, VertexConsumerProvider.Immediate immediate) {
@@ -184,48 +168,44 @@ private static RenderLayer SKY_MEDIA_LAYER(Identifier texture) {
                 }
 
         //RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-    VertexConsumer buffer =
-        immediate.getBuffer(
-                SKY_MEDIA_LAYER(texture)
-        );
-
-MatrixStack.Entry entry = matrices.peek();
-
+   MatrixStack.Entry entry = matrices.peek();
+   
+   VertexConsumer buffer = immediate.getBuffer(RenderLayers.beaconBeam(texture, true)); //this was the closest I can find, 
 int light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
 
 buffer.vertex(entry, -0.5f, -0.5f, 0f)
         .color(255,255,255,255)
-        .texture(u0, v1);
-        //.overlay(OverlayTexture.DEFAULT_UV)       
-        //.light(light) 
-        //.normal(entry, 0f, 0f, 1f);              
+        .texture(u0, v1)
+        .overlay(OverlayTexture.DEFAULT_UV)       
+        .light(light) 
+        .normal(entry, 0f, 0f, 1f);              
         
 
 buffer.vertex(entry, 0.5f, -0.5f, 0f)
         .color(255,255,255,255)
-        .texture(u1, v1);
-        //.overlay(OverlayTexture.DEFAULT_UV)       
-        //.light(light) 
-        //.normal(entry, 0f, 0f, 1f);              
+        .texture(u1, v1)
+        .overlay(OverlayTexture.DEFAULT_UV)       
+        .light(light) 
+        .normal(entry, 0f, 0f, 1f);              
         
 
 buffer.vertex(entry, 0.5f, 0.5f, 0f)
         .color(255,255,255,255)
-        .texture(u1, v0);
-        //.overlay(OverlayTexture.DEFAULT_UV)       
-        //.light(light) 
-        //.normal(entry, 0f, 0f, 1f);              
+        .texture(u1, v0)
+        .overlay(OverlayTexture.DEFAULT_UV)       
+        .light(light) 
+        .normal(entry, 0f, 0f, 1f);              
         
 
 buffer.vertex(entry, -0.5f, 0.5f, 0f)
         .color(255,255,255,255)
-        .texture(u0, v0);
-        //.overlay(OverlayTexture.DEFAULT_UV)       
-        //.light(light) 
-        //.normal(entry, 0f, 0f, 1f);              
+        .texture(u0, v0)
+        .overlay(OverlayTexture.DEFAULT_UV)       
+        .light(light) 
+        .normal(entry, 0f, 0f, 1f);              
         
 
-immediate.draw();
+
         
         matrices.pop();
     }
@@ -240,7 +220,9 @@ immediate.draw();
 
             case END -> current == World.END;
 
-            default -> true;
+            case BOTH -> current == World.OVERWORLD || current == World.END;
+            
+            default -> false;
         };
     }
 
@@ -259,6 +241,7 @@ immediate.draw();
             case NIGHT -> time >= 13000 && time < 24000;
 
             case BOTH -> true;
+
         };
     }
 }
