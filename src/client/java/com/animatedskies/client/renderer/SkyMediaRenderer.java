@@ -201,7 +201,9 @@ public class SkyMediaRenderer {
 
             case END -> current == World.END;
 
-            default -> true;
+            case BOTH -> current == World.END || current == World.OVERWORLD;
+
+            default -> false;
         };
     }
 
